@@ -1,0 +1,14 @@
+# TESTS
+coverage
+nose
+nose-progressive
+tox
+
+coveralls
+python-coveralls
+
+flake8
+
+# DOCS
+sphinx
+sphinx_rtd_theme

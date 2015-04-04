@@ -1,0 +1,5 @@
+# git clone https://gist.github.com/38995ed49140bdf9ec77.git
+#pip freeze > requirements.txt.lock
+
+fabric
+

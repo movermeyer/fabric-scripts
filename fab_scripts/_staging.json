@@ -1,0 +1,12 @@
+{
+    "python": "pypy",
+    "url": "http://codeart-staging.herokuapp.com",
+    "host": "codeart-staging.herokuapp.com",
+    "port": 80,
+    "heroku_app": "codeart-staging",
+    "heroku_app_addons": ["newrelic", "papertrail", "redistogo", "mongolab"],
+    "heroku_worker": null,
+    "heroku_worker_addons": ["papertrail", "scheduler", "sendgrid", "mailgun", "mandrill"],
+    "heroku_cedar": "cedar-14",
+    "paths": []
+}
