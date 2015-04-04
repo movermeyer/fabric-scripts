@@ -8,7 +8,7 @@ fabric-scripts
 [![PyPi version](https://pypip.in/v/fabric-scripts/badge.png)](https://crate.io/packages/fabric-scripts/)
 [![PyPi downloads](https://pypip.in/d/fabric-scripts/badge.png)](https://crate.io/packages/fabric-scripts/)
 
-**Latest version: 0.0.4 (2014/09)**
+**Latest version: 0.0.5 (2014/09)**
 
 Small description.
 
@@ -27,3 +27,13 @@ Documentation
 -------------
 
 http://fabric-scripts.readthedocs.org/en/latest/index.html
+
+
+Troubleshooting
+----------------
+
+Fixing upgrade issue caused by Pip bug:
+
+    sudo rm -rf /private/tmp/pip-build-root/fabric-scripts/
+    sudo pip install fabric-scripts --upgrade
+    python -c "import fab_scripts ; print(fab_scripts.VERSION)"
