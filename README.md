@@ -12,6 +12,17 @@ fabric-scripts
 
 Small description.
 
+Install
+-------------
+
+    sudo pip install fabric
+    sudo pip install fabric-scripts
+
+Upgrade
+-------------
+
+    sudo pip install fabric-scripts --upgrade
+
 Documentation
 -------------
 

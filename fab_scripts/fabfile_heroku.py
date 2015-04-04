@@ -132,7 +132,7 @@ def install(packages):
     elif isLinux():
         env.sudo('apt-get install -y %(package)s' % dict(package=packages))
 
-def bootstrap_heroku(app_name, addons, branch=None, domain=None, cedar=None):
+def prepare_heroku(app_name, addons, branch=None, domain=None, cedar=None):
     print(red("Configuring heroku"))
     env.run('heroku apps:create %s' % app_name)
     if branch:
@@ -370,10 +370,10 @@ def start_server(foreman=True, app='app.py'):
 @task
 def bootstrap_heroku():
     if env.heroku_app:
-        bootstrap_heroku(env.heroku_app, env.heroku_app_addons,
+        prepare_heroku(env.heroku_app, env.heroku_app_addons,
             branch=env.heroku_app_git_remote, domain=env.host, cedar=env.heroku_cedar)
     if env.heroku_worker:
-        bootstrap_heroku(env.heroku_worker, env.heroku_worker_addons,
+        prepare_heroku(env.heroku_worker, env.heroku_worker_addons,
             branch=env.heroku_app_git_remote, domain=env.host, cedar=env.heroku_cedar)
 
 @task
