@@ -474,12 +474,12 @@ def ping(time=3):
 @task
 def warmup():
     for path in env.paths:
-        weighttp(env.url, path, requests=5000, concurrency=10)
+        weighttp(env.url + path, requests=5000, concurrency=10)
 
 @task
 def benchmark():
     for path in env.paths:
-        weighttp(env.url, path, requests=10000, concurrency=50)
+        weighttp(env.url + path, requests=10000, concurrency=50)
 
 @task
 def browse():
