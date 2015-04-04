@@ -4,6 +4,7 @@ import codecs
 import json
 import os
 import platform
+import re
 import subprocess
 import sys
 
@@ -268,6 +269,73 @@ def weighttp(requests=10000, concurrency=50, threads=5):
     for path in env.paths:
         env.run('weighttp -n %s -c %s -t %s -k %s%s' % (requests, concurrency, threads, env.url, path))
 
+def weighttp(url, requests=10000, concurrency=50, threads=5):
+    def format_weighttp_result(results):
+        '''
+        finished in 1 sec, 665 millisec and 7 microsec, 6005 req/s, 1225 kbyte/s
+        requests: 10000 total, 10000 started, 10000 done, 0 succeeded, 10000 failed, 0 errored
+        status codes: 10000 2xx, 0 3xx, 0 4xx, 0 5xx
+        traffic: 2090000 bytes total, 2090000 bytes http, 0 bytes data
+        '''
+        def parse_summary_line(line):
+            'finished in 1 sec, 665 millisec and 7 microsec, 6005 req/s, 1225 kbyte/s'
+            reqs_per_seconds = re.search(r'(\d+[.]?\d*) req/s', line).groups(0)[0]
+            kbs_per_seconds = re.search(r'(\d+[.]?\d*) kbyte/s', line).groups(0)[0]
+            elapsed_time = re.sub(r'microsec.+', 'microsec', line.replace('finished in ', ''))
+            return elapsed_time, int(reqs_per_seconds), int(kbs_per_seconds)
+
+        def parse_requests_line(line):
+            'requests: 10000 total, 10000 started, 10000 done, 0 succeeded, 10000 failed, 0 errored'
+            reqs = dict(total=0, started=0, done=0, succeeded=0, failed=0, errored=0)
+            tokens = map(str.strip, line.replace('requests: ', '').split(','))
+            for t in tokens:
+                value, req = t.split(' ')
+                reqs[req] = int(value)
+            return reqs
+
+        def parse_status_code_line(line):
+            'status codes: 10000 2xx, 0 3xx, 0 4xx, 0 5xx'
+            codes = {'2xx': 0, '3xx': 0, '4xx': 0, '5xx': 0}
+            tokens = map(str.strip, line.replace('status codes: ', '').split(','))
+            for t in tokens:
+                value, code = t.split(' ')
+                codes[code] = int(value)
+            return codes
+
+        results = results.replace('\n', 'newline')
+        results = re.sub(r'^(.*)finished', 'finished', results, flags=re.M).strip()
+        lines = results.split('newline')
+        elapsed_time, reqs_per_second, kbs_per_second = parse_summary_line(lines[0])
+        reqs = parse_requests_line(lines[1])
+        codes = parse_status_code_line(lines[2])
+
+        if reqs['failed'] == 0 and reqs['errored'] == 0 and reqs['total'] == reqs['done'] and codes['4xx'] == 0 and codes['5xx'] == 0:
+            print(green('Success'))
+        else:
+            print(red('Error'))
+
+        for req, value in reqs.items():
+            if value > 0:
+                if req in ['failed', 'errored']:
+                    print(red('%s: %s' % (req, value)))
+                else:
+                    print('%s: %s' % (req, value))
+
+        for code, value in codes.items():
+            if value > 0:
+                if code in ['4xx', '5xx']:
+                    print(red('%s: %s' % (code, value)))
+                else:
+                    print('%s: %s' % (code, value))
+        print(blue('%s reqs/s' % reqs_per_second))
+        return elapsed_time, reqs_per_second, kbs_per_second, reqs, codes
+
+    # http://adventuresincoding.com/2012/05/how-to-get-apachebenchab-to-work-on-mac-os-x-lion
+    # install('Weighttp')
+    results = env.run('weighttp -n %s -c %s -t %s -k %s' % (requests, concurrency, threads, url), capture=True)
+    return format_weighttp_result(results)
+
+
 # Tasks Localhost
 
 @task
@@ -403,11 +471,13 @@ def ping(time=3):
 
 @task
 def warmup():
-    weighttp(requests=5000, concurrency=10)
+    for path in env.paths:
+        weighttp(env.url, path, requests=5000, concurrency=10)
 
 @task
 def benchmark():
-    weighttp(requests=10000, concurrency=50)
+    for path in env.paths:
+        weighttp(env.url, path, requests=10000, concurrency=50)
 
 @task
 def browse():
