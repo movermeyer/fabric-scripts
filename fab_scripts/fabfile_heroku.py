@@ -263,12 +263,6 @@ def upload_file(bucket_name, filename):
     else:
         upload_file_to_s3(bucket_name, filename, public=True, static_headers=False, gzip=False)
 
-def weighttp(requests=10000, concurrency=50, threads=5):
-    # http://adventuresincoding.com/2012/05/how-to-get-apachebenchab-to-work-on-mac-os-x-lion
-    # install('Weighttp')
-    for path in env.paths:
-        env.run('weighttp -n %s -c %s -t %s -k %s%s' % (requests, concurrency, threads, env.url, path))
-
 def weighttp(url, requests=10000, concurrency=50, threads=5):
     def format_weighttp_result(results):
         '''
