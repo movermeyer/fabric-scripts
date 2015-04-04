@@ -364,10 +364,12 @@ def test():
         env.run(vrun('tox'))
 
 @task
-def start_server():
+def start_server(foreman=True, app='app.py'):
     with prefix(venv()):
-        # env.run('foreman start -p %s' % env.port)
-        env.run('python app.py')
+        if foreman:
+            env.run('foreman start -p %s' % env.port)
+        else:
+            env.run('python %s' % app)
 
 # Tasks Production/Staging
 
