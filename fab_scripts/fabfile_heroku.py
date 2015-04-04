@@ -402,16 +402,16 @@ def set_env_vars():
         AWS_SECRET_ACCESS_KEY=os.getenv('AWS_SECRET_ACCESS_KEY', '').strip(),
         AWS_REGION=os.getenv('AWS_REGION', '').strip(),
     )
-    shared_vars = dict(REDISTOGO_URL='', REDIS_URL='', MONGOHQ_URL='', MONGOLAB_URI='', DATABASE_URL='')
     if env.heroku_app:
         env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env_vars), app=env.heroku_app))
-        for var, _ in shared_vars.items():
-            value = env.run('heroku config:get %(var)s --app %(app)s' % dict(var=var, app=env.heroku_app), capture=True)
-            shared_vars[var] = value
-
     if env.heroku_worker:
         env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env_vars), app=env.heroku_worker))
-        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(shared_vars), app=env.heroku_worker))
+        if env.heroku_app:
+            shared_vars = dict(REDISTOGO_URL='', REDIS_URL='', MONGOHQ_URL='', MONGOLAB_URI='', DATABASE_URL='')
+            for var, _ in shared_vars.items():
+                value = env.run('heroku config:get %(var)s --app %(app)s' % dict(var=var, app=env.heroku_app), capture=True)
+                shared_vars[var] = value
+            env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(shared_vars), app=env.heroku_worker))
 
 @task
 def deploy(tag=None):
