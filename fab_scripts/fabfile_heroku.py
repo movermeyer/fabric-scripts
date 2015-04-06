@@ -263,8 +263,8 @@ def upload_file(bucket_name, filename):
     else:
         upload_file_to_s3(bucket_name, filename, public=True, static_headers=False, gzip=False)
 
-def weighttp(url, requests=10000, concurrency=50, threads=5):
-    def format_weighttp_result(results):
+def weighttp(url, requests=10000, concurrency=50, threads=5, log=True):
+    def format_weighttp_result(results, log=True):
         '''
         finished in 1 sec, 665 millisec and 7 microsec, 6005 req/s, 1225 kbyte/s
         requests: 10000 total, 10000 started, 10000 done, 0 succeeded, 10000 failed, 0 errored
@@ -289,11 +289,11 @@ def weighttp(url, requests=10000, concurrency=50, threads=5):
 
         def parse_status_code_line(line):
             'status codes: 10000 2xx, 0 3xx, 0 4xx, 0 5xx'
-            codes = {'2xx': 0, '3xx': 0, '4xx': 0, '5xx': 0}
+            codes = dict(_2xx=0, _3xx=0, _4xx=0, _5xx=0)
             tokens = map(str.strip, line.replace('status codes: ', '').split(','))
             for t in tokens:
                 value, code = t.split(' ')
-                codes[code] = int(value)
+                codes['_' + code] = int(value)
             return codes
 
         results = results.replace('\n', 'newline')
@@ -303,31 +303,37 @@ def weighttp(url, requests=10000, concurrency=50, threads=5):
         reqs = parse_requests_line(lines[1])
         codes = parse_status_code_line(lines[2])
 
-        if reqs['failed'] == 0 and reqs['errored'] == 0 and reqs['total'] == reqs['done'] and codes['4xx'] == 0 and codes['5xx'] == 0:
-            print(green('Success'))
-        else:
-            print(red('Error'))
+        if log:
+            if reqs['failed'] == 0 and reqs['errored'] == 0 and reqs['total'] == reqs['done'] and codes['_4xx'] == 0 and codes['_5xx'] == 0:
+                print(green('Success'))
+            else:
+                print(red('Error'))
 
-        for req, value in reqs.items():
-            if value > 0:
-                if req in ['failed', 'errored']:
-                    print(red('%s: %s' % (req, value)))
-                else:
-                    print('%s: %s' % (req, value))
+            for req, value in reqs.items():
+                if value > 0:
+                    if req in ['failed', 'errored']:
+                        print(red('%s: %s' % (req, value)))
+                    else:
+                        print('%s: %s' % (req, value))
 
-        for code, value in codes.items():
-            if value > 0:
-                if code in ['4xx', '5xx']:
-                    print(red('%s: %s' % (code, value)))
-                else:
-                    print('%s: %s' % (code, value))
-        print(blue('%s reqs/s' % reqs_per_second))
-        return elapsed_time, reqs_per_second, kbs_per_second, reqs, codes
+            for code, value in codes.items():
+                if value > 0:
+                    if code in ['_4xx', '_5xx']:
+                        print(red('%s: %s' % (code, value)))
+                    else:
+                        print('%s: %s' % (code, value))
+            print(blue('%s reqs/s' % reqs_per_second))
+
+
+        results = dict(elapsed_time=elapsed_time, reqs_per_second=reqs_per_second, kbs_per_second=kbs_per_second)
+        results['requests'] = reqs
+        results['status_codes'] = codes
+        return results
 
     # http://adventuresincoding.com/2012/05/how-to-get-apachebenchab-to-work-on-mac-os-x-lion
     # install('Weighttp')
     results = env.run('weighttp -n %s -c %s -t %s -k %s' % (requests, concurrency, threads, url), capture=True)
-    return format_weighttp_result(results)
+    return format_weighttp_result(results, log=log)
 
 
 # Tasks Localhost
