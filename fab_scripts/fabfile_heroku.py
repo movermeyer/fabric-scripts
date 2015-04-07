@@ -381,6 +381,26 @@ def start_server(foreman=True, app='app.py'):
         else:
             env.run('python %s' % app)
 
+@task
+def start_all(config_file=None):
+    if config_file:
+        env.run('supervisord -c %s' % config_file)
+    else:
+        if os.path.exists('./supervisord.conf'):
+            env.run('supervisord')
+        else:
+            d = os.path.dirname(__file__)
+            config_file = os.path.join(d, 'supervisord.conf')
+            env.run('supervisord -c %s' % config_file)
+
+@task
+def status():
+    env.run('supervisorctl status')
+
+@task
+def stop_all():
+    env.run('supervisorctl shutdown')
+
 # Tasks Production/Staging
 
 @task
