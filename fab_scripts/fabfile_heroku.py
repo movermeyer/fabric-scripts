@@ -351,6 +351,16 @@ def bootstrap():
 def info():
     env.run('uname -a')
     env.run('ulimit -aH')
+    env.run('ulimit -n')
+    # TIME_WAIT length in ms / default 15000
+    env.run('sysctl net.inet.tcp.msl')
+    # Update TIME_WAIT length
+    env.run('sudo sysctl -w net.inet.tcp.msl=1000')
+    # Number of ephemeral ports
+    env.run('sysctl net.inet.ip.portrange.first net.inet.ip.portrange.last')
+    # max sockets
+    env.run('sysctl -a | grep somax')
+
     with prefix(venv()):
         env.run(python('--version'))
     if env.heroku_app:
