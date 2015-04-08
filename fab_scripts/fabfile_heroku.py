@@ -106,6 +106,15 @@ def read_config_file(filename):
            print(data)
            env.update(data)
 
+def str2bool(string):
+    if not string:
+        return False
+    if isinstance(string, (str,)):
+        string = string.lower()
+        options = ['none', 'null', 'nil', 'false', 'f', 'no', '0']
+        return not (string in options)
+    return string
+
 def current_git_branch():
     label = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
     return label.strip()
