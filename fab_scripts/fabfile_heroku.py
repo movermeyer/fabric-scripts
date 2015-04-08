@@ -272,9 +272,47 @@ def upload_file(bucket_name, filename):
     else:
         upload_file_to_s3(bucket_name, filename, public=True, static_headers=False, gzip=False)
 
+@task
+def ab(url, requests=10000, concurrency=50, timelimit=0, log=True, verbose=False):
+    """
+    Example:
+    Time taken for tests:   0.008 seconds
+    Complete requests:      1
+    Failed requests:        0
+    Non-2xx responses:      1
+    Requests per second:    129.82 [#/sec] (mean)
+    """
+    log_level = 2 if verbose else 0
+    if timelimit:
+        results = env.run('ab -n %s -c %s -t %s -v %s %s' % (requests, concurrency, timelimit, log_level, url), capture=True)
+    else:
+        results = env.run('ab -n %s -c %s -v %s %s' % (requests, concurrency, log_level, url), capture=True)
+    r = results.replace('\n', 'newline')
+    reqs_per_second = re.search(r'.*Requests per second:\s*(\d+[.]?\d*)', r).groups(0)[0]
+    elapsed_time = re.search(r'.*Time taken for tests:\s*(\d+[.]?\d*)', r).groups(0)[0]
+    complete_requests = int(re.search(r'.*Complete requests:\s*(\d+)', r).groups(0)[0])
+    failed_requests = int(re.search(r'.*Failed requests:\s*(\d+)', r).groups(0)[0])
+    try:
+        non_2xx_requests = int(re.search(r'.*Non-2xx responses:\s*(\d+)', r).groups(0)[0])
+    except (AttributeError, IndexError, ValueError):
+        non_2xx_requests = 0
+    if log:
+        if failed_requests > 0 or non_2xx_requests > 0:
+            print(red('Error'))
+            print(red('Failed: %s' % (failed_requests)))
+            print(red('non 2xx: %s' % (non_2xx_requests)))
+        else:
+            print(green('Success'))
+        print(blue('%s reqs/s' % reqs_per_second))
+    return dict(reqs_per_second=reqs_per_second, elapsed_time=elapsed_time,
+        complete_requests=complete_requests, failed_requests=failed_requests,
+        non_2xx_requests=non_2xx_requests)
+
+@task
 def weighttp(url, requests=10000, concurrency=50, threads=5, log=True):
     def format_weighttp_result(results, log=True):
         '''
+        Example:
         finished in 1 sec, 665 millisec and 7 microsec, 6005 req/s, 1225 kbyte/s
         requests: 10000 total, 10000 started, 10000 done, 0 succeeded, 10000 failed, 0 errored
         status codes: 10000 2xx, 0 3xx, 0 4xx, 0 5xx
