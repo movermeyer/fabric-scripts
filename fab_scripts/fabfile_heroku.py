@@ -446,6 +446,7 @@ def status():
 
 @task
 def stop_all():
+    env.run('supervisorctl stop all')
     env.run('supervisorctl shutdown')
 
 # Tasks Production/Staging
