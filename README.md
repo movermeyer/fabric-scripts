@@ -8,7 +8,7 @@ fabric-scripts
 [![PyPi version](https://pypip.in/v/fabric-scripts/badge.png)](https://crate.io/packages/fabric-scripts/)
 [![PyPi downloads](https://pypip.in/d/fabric-scripts/badge.png)](https://crate.io/packages/fabric-scripts/)
 
-**Latest version: 0.0.9 (2014/09)**
+**Latest version: 0.0.10 (2014/09)**
 
 Small description.
 
