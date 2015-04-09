@@ -351,26 +351,19 @@ def weighttp(url, requests=10000, concurrency=50, threads=5, log=True):
         codes = parse_status_code_line(lines[2])
 
         if log:
-            if reqs['failed'] == 0 and reqs['errored'] == 0 and reqs['total'] == reqs['done'] and codes['_4xx'] == 0 and codes['_5xx'] == 0:
-                print(green('Success'))
+            success = reqs['failed'] == 0 and reqs['errored'] == 0 and reqs['total'] == reqs['done'] and codes['_4xx'] == 0 and codes['_5xx'] == 0
+            if success:
+                m = green('Success')
+                s = '2xx: %s 3xx: %s' % (codes['_2xx'], codes['_3xx']) + ' 4xx: %s 5xx: %s' % (codes['_4xx'], codes['_5xx'])
+                e = 'Failed: %s Errored: %s' % (reqs['failed'], reqs['errored'])
             else:
-                print(red('Error'))
-
-            for req, value in reqs.items():
-                if value > 0:
-                    if req in ['failed', 'errored']:
-                        print(red('%s: %s' % (req, value)))
-                    else:
-                        print('%s: %s' % (req, value))
-
-            for code, value in codes.items():
-                if value > 0:
-                    if code in ['_4xx', '_5xx']:
-                        print(red('%s: %s' % (code, value)))
-                    else:
-                        print('%s: %s' % (code, value))
+                m = red('Error')
+                s = '2xx: %s 3xx: %s' % (codes['_2xx'], codes['_3xx']) + red(' 4xx: %s 5xx: %s' % (codes['_4xx'], codes['_5xx']))
+                e = red('Failed: %s Errored: %s' % (reqs['failed'], reqs['errored']))
+            n = 'Total: %s Started: %s Done: %s Succeeded: %s' % (reqs['total'], reqs['started'], reqs['done'], reqs['succeeded'])
+            print(m + ' ' + s)
+            print(n + ' ' + e)
             print(blue('%s reqs/s' % reqs_per_second))
-
 
         results = dict(elapsed_time=elapsed_time, reqs_per_second=reqs_per_second, kbs_per_second=kbs_per_second)
         results['requests'] = reqs
