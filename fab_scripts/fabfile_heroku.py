@@ -143,18 +143,20 @@ def install(packages):
 
 def prepare_heroku(app_name, addons, branch=None, domain=None, cedar=None):
     print(red("Configuring heroku"))
-    env.run('heroku apps:create %s' % app_name)
-    if branch:
-        env.run('git remote add %s git@heroku.com:%s.git' % (branch, app_name))
-    if cedar:
-        env.run('heroku stack:set %s --app %s' % (cedar, app_name))
-    for addon in addons:
-        env.run('heroku addons:add %s --app %s' % (addon, app_name))
-        if addon == 'newrelic':
-            newrelic_key = env.run('heroku config:get NEW_RELIC_LICENSE_KEY --app %s' % (app_name), capture=True)
-            env.run('newrelic-admin generate-config %s newrelic.ini' % newrelic_key)
-    if domain and not domain.endswith('herokuapp.com'):
-        env.run('heroku domains:add %s --app %s' % (domain, app_name))
+    with settings(warn_only=True):
+        env.run('heroku apps:create %s' % app_name)
+        if branch:
+            env.run('git remote add %s git@heroku.com:%s.git' % (branch, app_name))
+        if cedar:
+            env.run('heroku stack:set %s --app %s' % (cedar, app_name))
+        for addon in addons:
+            env.run('heroku addons:add %s --app %s' % (addon, app_name))
+            if addon == 'newrelic':
+                with prefix(venv()):
+                    newrelic_key = env.run('heroku config:get NEW_RELIC_LICENSE_KEY --app %s' % (app_name), capture=True)
+                    env.run('newrelic-admin generate-config %s newrelic.ini' % newrelic_key)
+        if domain and not domain.endswith('herokuapp.com'):
+            env.run('heroku domains:add %s --app %s' % (domain, app_name))
     print(green("Bootstrap success"))
 
 def get_bucket_policy(bucket, host):
