@@ -103,7 +103,7 @@ def read_config_file(filename):
     if os.path.exists(filename):
         with codecs.open(filename, 'r', 'utf-8') as f:
            data = json.loads(f.read())
-           print(data)
+           # print(data)
            env.update(data)
 
 def str2bool(string):
