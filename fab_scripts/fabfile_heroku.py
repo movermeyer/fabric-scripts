@@ -104,12 +104,12 @@ def profile(fn):
         return ret
     return decorated
 
-def wait_for(limit, seconds, func, *args):
+def wait_for(limit, seconds, func, *args, **kwargs):
     c = 0
-    while c < limit and func(*args):
+    while c < limit and func(*args, **kwargs):
         c += 1
         time.sleep(seconds)
-    return func(*args)
+    return func(*args, **kwargs)
 
 def read_config_file(filename):
     """
