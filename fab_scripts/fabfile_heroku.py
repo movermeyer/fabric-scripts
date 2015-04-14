@@ -104,6 +104,13 @@ def profile(fn):
         return ret
     return decorated
 
+def wait_for(limit, seconds, func, *args):
+    c = 0
+    while c < limit and func(*args):
+        c += 1
+        time.sleep(seconds)
+    return func(*args)
+
 def read_config_file(filename):
     """
     Example of the file localhost.json:
