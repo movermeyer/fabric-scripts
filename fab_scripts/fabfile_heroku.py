@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import with_statement
+from functools import wraps
 import codecs
 import json
 import os
@@ -7,6 +8,7 @@ import platform
 import re
 import subprocess
 import sys
+import time
 
 from fabric.api import *
 from fabric.colors import *
@@ -91,6 +93,16 @@ def common():
 
 
 # Utilities
+
+def profile(fn):
+    @wraps(fn)
+    def decorated(*args, **kwargs):
+        start_time = time.time()
+        ret = fn(*args, **kwargs)
+        elapsed_time = time.time() - start_time
+        print(blue('Execution time %.3f' % (elapsed_time)))
+        return ret
+    return decorated
 
 def read_config_file(filename):
     """
