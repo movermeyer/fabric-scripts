@@ -126,11 +126,15 @@ def read_config_file(filename):
            env.update(data)
 
 def str2bool(string):
+    "It returns True, False or None"
     if not string:
-        return False
+        return None
     if isinstance(string, (str,)):
         string = string.lower()
-        options = ['none', 'null', 'nil', 'false', 'f', 'no', '0']
+        options = ['none', 'null', 'nil']
+        if string in options:
+            return None
+        options = ['false', 'f', 'no', '0']
         return not (string in options)
     return string
 
