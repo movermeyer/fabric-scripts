@@ -16,7 +16,7 @@ env.run = local
 env.sudo = local
 env.venv = 'env'
 env.python = 'python2.7'
-env.version = '0.0.15'
+env.version = '0.0.16'
 # Examples of Usage
 # fab --list
 
