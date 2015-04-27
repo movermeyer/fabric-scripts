@@ -12,6 +12,9 @@ from fabric.colors import *
 from fabric.utils import abort
 from fabric.contrib.console import confirm
 
+from .fab_utils import *
+
+
 env.run = local
 env.sudo = local
 env.venv = 'env'

@@ -26,6 +26,25 @@ Upgrade
 Documentation
 -------------
 
+Add fo your fabfile.py:
+
+    from fab_scripts.fabfile_s3 import *
+    from fab_scripts.fabfile_unix import *
+    from fab_scripts.fabfile_supervisor import *
+    from fab_scripts.fabfile_heroku import *
+
+Create the files:
+
+    localhost.json
+    staging.json
+    production.json
+
+
+Check your tasks:
+
+    fab --list
+
+
 http://fabric-scripts.readthedocs.org/en/latest/index.html
 
 
