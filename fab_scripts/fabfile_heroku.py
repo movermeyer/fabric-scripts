@@ -199,7 +199,19 @@ def deploy(tag=None, folder='static'):
         env.run('heroku ps:scale worker=1 --app %s' % env.heroku_worker)
 
     warmup()
-    print(green("Deploy success"))
+
+    if tag:
+        reset_tag(tag)
+        create_tag(tag)
+    else:
+        last_tag = last_git_tag()
+        if last_tag:
+            tag = autoincrement_tag(last_tag)
+        else:
+            tag = '0.0.0'
+        create_tag(tag)
+
+    print(green("Deploy success (%s)" % tag))
 
 @task
 def rollback(tag=None, worker=False):

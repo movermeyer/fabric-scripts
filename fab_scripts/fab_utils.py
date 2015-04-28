@@ -100,10 +100,6 @@ def str2bool(string):
         return not (string in options)
     return string
 
-def current_git_branch():
-    label = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
-    return label.strip()
-
 def isMac():
     return platform.system().lower() == 'darwin'
 
@@ -126,6 +122,7 @@ def install(packages):
     elif isLinux():
         env.sudo('apt-get install -y %(package)s' % dict(package=packages))
 
+# JS/CSS
 
 def minify_js(jsfile):
     if jsfile.endswith('.js'):
@@ -144,6 +141,7 @@ def compress(textfile):
     env.run('mv %s.gz %s' % (textfile, gzipped_file))
     return gzipped_file
 
+# Benchmarks
 
 @task
 def ab(url, requests=10000, concurrency=50, timelimit=0, log=True, verbose=False):
@@ -247,3 +245,38 @@ def weighttp(url, requests=10000, concurrency=50, threads=5, log=True):
     # install('Weighttp')
     results = env.run('weighttp -n %s -c %s -t %s -k %s' % (requests, concurrency, threads, url), capture=True)
     return format_weighttp_result(results, log=log)
+
+# Git
+
+def autoincrement_tag(last_tag):
+    """
+    autoincrement_tag('1') => 2
+    autoincrement_tag('1.2') => 1.3
+    autoincrement_tag('1.2.3') => 1.2.4
+    """
+    tokens = last_tag.split('.')
+    r = int(tokens[-1]) + 1
+    if len(tokens) > 1:
+        return '%s.%s' % ('.'.join(tokens[0:-1]), r)
+    else:
+        return str(r)
+
+def current_git_branch():
+    label = local('git rev-parse --abbrev-ref HEAD', capture=True).strip()
+    return label
+
+def last_git_tag():
+    with quiet():
+        last = local('git describe --abbrev=0 --tags', capture=True).strip()
+        return last
+
+@task
+def create_tag(tag):
+    env.run('git tag %s' % tag)
+    env.run('git push origin %s' % tag)
+
+@task
+def reset_tag(tag):
+    with quiet():
+        env.run('git tag -d %s' % tag)
+        env.run('git push origin :refs/tags/%s' % tag)
