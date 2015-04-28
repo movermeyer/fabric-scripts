@@ -1,5 +1,5 @@
 {
-    "python": "pypy",
+    "python": "python2.7",
     "url": "http://codeart-staging.herokuapp.com",
     "host": "codeart-staging.herokuapp.com",
     "port": 80,
