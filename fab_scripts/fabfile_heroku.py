@@ -157,7 +157,7 @@ def bootstrap_heroku():
             branch=env.heroku_app_git_remote, domain=env.host, cedar=env.heroku_cedar)
     if env.heroku_worker:
         prepare_heroku(env.heroku_worker, env.heroku_worker_addons,
-            branch=env.heroku_app_git_remote, domain=env.host, cedar=env.heroku_cedar)
+            branch=env.heroku_app_git_remote, cedar=env.heroku_cedar)
 
 @task
 def set_env_vars():
