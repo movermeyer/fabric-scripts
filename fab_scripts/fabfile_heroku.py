@@ -120,7 +120,7 @@ def prepare_heroku(app_name, addons, branch=None, domain=None, cedar=None):
 @task
 def bootstrap():
     print(red("Configuring application"))
-    env.run('virtualenv %(env)s -p %(python)s' % dict(env=env.venv, python=env.python))
+    env.run('virtualenv %(env)s -p %(python)s --no-site-package' % dict(env=env.venv, python=env.python))
     with prefix(venv()):
         env.run('pip install -r requirements.txt')
         start_server()
