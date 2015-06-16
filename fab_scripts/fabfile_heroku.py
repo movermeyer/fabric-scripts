@@ -106,7 +106,7 @@ def prepare_heroku(app_name, addons, branch=None, domain=None, cedar=None):
         if cedar:
             env.run('heroku stack:set %s --app %s' % (cedar, app_name))
         for addon in addons:
-            env.run('heroku addons:add %s --app %s' % (addon, app_name))
+            env.run('heroku addons:create %s --app %s' % (addon, app_name))
             if addon == 'newrelic':
                 with prefix(venv()):
                     newrelic_key = env.run('heroku config:get NEW_RELIC_LICENSE_KEY --app %s' % (app_name), capture=True)
