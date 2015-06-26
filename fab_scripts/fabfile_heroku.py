@@ -48,6 +48,7 @@ def localhost():
     env.heroku_worker_git_remote = None
     env.heroku_deploy_branch = None
     env.aws_bucket = 'codeart-localhost'
+    env.tag_suffix = ''
     print(blue("Localhost"))
 
 @task
@@ -62,6 +63,7 @@ def staging():
     env.heroku_worker_git_remote = 'heroku-worker-staging'
     env.heroku_deploy_branch = 'staging:master'
     env.aws_bucket = env.heroku_app
+    env.tag_suffix = '-staging'
     print(blue("Staging"))
 
 @task
@@ -75,6 +77,7 @@ def production():
     env.heroku_worker_git_remote = 'heroku-worker'
     env.heroku_deploy_branch = 'master'
     env.aws_bucket = env.heroku_app
+    env.tag_suffix = ''
     print(blue("Production"))
 
 def common():
@@ -210,7 +213,7 @@ def deploy(tag=None, folder='static'):
             tag = autoincrement_tag(last_tag)
         else:
             tag = '0.0.0'
-        create_tag(tag)
+        create_tag(tag + env.tag_suffix)
 
     print(green("Deploy success (%s)" % tag))
 
