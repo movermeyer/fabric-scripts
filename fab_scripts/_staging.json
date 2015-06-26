@@ -8,5 +8,14 @@
     "heroku_worker": null,
     "heroku_worker_addons": ["papertrail", "scheduler", "sendgrid", "mailgun", "mandrill"],
     "heroku_cedar": "cedar-14",
-    "paths": []
+    "paths": [],
+    "vars": {
+        "DEBUG": "True",
+        "HEROKU": "True",
+        "AWS_STORAGE_BUCKET_NAME": "$AWS_STORAGE_BUCKET_NAME",
+        "AWS_ACCESS_KEY_ID": "$AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY": "$AWS_SECRET_ACCESS_KEY",
+        "AWS_REGION": "$AWS_REGION"
+    },
+    "shared_vars": ["REDISTOGO_URL", "REDIS_URL", "MONGOHQ_URL", "MONGOLAB_URI", "DATABASE_URL"]
 }

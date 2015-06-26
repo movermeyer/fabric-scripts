@@ -163,20 +163,21 @@ def bootstrap_heroku():
 def set_env_vars():
     def vars_line(data):
         return ' '.join(['%s=%s' % (var, value) for var, value in data.items()])
-    env_vars = dict(
-        AWS_ACCESS_KEY_ID=os.getenv('AWS_ACCESS_KEY_ID', '').strip(),
-        AWS_SECRET_ACCESS_KEY=os.getenv('AWS_SECRET_ACCESS_KEY', '').strip(),
-        AWS_REGION=os.getenv('AWS_REGION', '').strip(),
-    )
+
+    for var_name, value in env.vars.items():
+        if value.startswith('$'):
+            env.vars[var_name] = os.getenv(value[1:])
+        env.vars[var_name] = env.vars[var_name].strip()
+
     if env.heroku_app:
-        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env_vars), app=env.heroku_app))
+        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env.vars), app=env.heroku_app))
     if env.heroku_worker:
-        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env_vars), app=env.heroku_worker))
+        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env.vars), app=env.heroku_worker))
         if env.heroku_app:
-            shared_vars = dict(REDISTOGO_URL='', REDIS_URL='', MONGOHQ_URL='', MONGOLAB_URI='', DATABASE_URL='')
-            for var, _ in shared_vars.items():
-                value = env.run('heroku config:get %(var)s --app %(app)s' % dict(var=var, app=env.heroku_app), capture=True)
-                shared_vars[var] = value
+            shared_vars = {}
+            for var_name in env.shared_vars:
+                value = env.run('heroku config:get %(var)s --app %(app)s' % dict(var=var_name, app=env.heroku_app), capture=True)
+                shared_vars[var_name] = value
             env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(shared_vars), app=env.heroku_worker))
 
 @task
