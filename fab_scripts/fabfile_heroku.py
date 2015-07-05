@@ -88,6 +88,8 @@ def common():
     env.heroku_worker_addons = []
     env.heroku_cedar = None
     env.paths = []
+    env.vars = {}
+    env.shared_vars = []
 
     env.run = local
     env.sudo = local
@@ -168,16 +170,20 @@ def set_env_vars():
         if value.startswith('$'):
             env.vars[var_name] = os.getenv(value[1:], '') or ''
 
-    if env.heroku_app:
-        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env.vars), app=env.heroku_app))
+    varsline = vars_line(env.vars)
+    if env.heroku_app and varsline:
+        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=varsline, app=env.heroku_app))
     if env.heroku_worker:
-        env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(env.vars), app=env.heroku_worker))
+        if varsline:
+            env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=varsline, app=env.heroku_worker))
         if env.heroku_app:
             shared_vars = {}
             for var_name in env.shared_vars:
                 value = env.run('heroku config:get %(var)s --app %(app)s' % dict(var=var_name, app=env.heroku_app), capture=True)
                 shared_vars[var_name] = value
-            env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=vars_line(shared_vars), app=env.heroku_worker))
+            varsline = vars_line(shared_vars)
+            if varsline:
+                env.run('heroku config:set %(vars)s --app %(app)s' % dict(vars=varsline, app=env.heroku_worker))
 
 @task
 def deploy(tag=None, folder='static'):
