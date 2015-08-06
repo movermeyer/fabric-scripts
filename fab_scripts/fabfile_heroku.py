@@ -164,7 +164,7 @@ def bootstrap_heroku():
 @task
 def set_env_vars():
     def vars_line(data):
-        return ' '.join(['%s=%s' % (var, value) for var, value in data.items()])
+        return ' '.join(['%s="%s"' % (var, value) for var, value in data.items()])
 
     for var_name, value in env.vars.items():
         if value.startswith('$'):
