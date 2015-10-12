@@ -20,12 +20,14 @@ from fabric.contrib.console import confirm
 @task
 def localhost():
     common()
+    env.is_localhost = True
     read_config_file('_localhost.json')
     print(blue("Localhost"))
 
 @task
 def staging():
     common()
+    env.is_staging = True
     if current_git_branch() != 'staging':
         if not confirm('Using staging environment without staging branch (%s). Are you sure?' % current_git_branch()):
             abort('cancelled by the user')
@@ -36,6 +38,7 @@ def staging():
 @task
 def production():
     common()
+    env.is_production = True
     if current_git_branch() != 'master':
         if not confirm('Using production environment without master branch (%s). Are you sure?' % current_git_branch()):
             abort('cancelled by the user')
@@ -43,6 +46,9 @@ def production():
     print(blue("Production"))
 
 def common():
+    env.is_localhost = False
+    env.is_staging = False
+    env.is_production = False
     env.python = 'python2.7'
     env.url = 'http://localhost:8000'
     env.host = 'localhost'
