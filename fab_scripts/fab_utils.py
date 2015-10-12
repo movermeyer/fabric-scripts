@@ -128,6 +128,13 @@ def install(packages):
     elif isLinux():
         env.sudo('apt-get install -y %(package)s' % dict(package=packages))
 
+
+@task
+def set_local_vars():
+    for var_name, value in env.vars.items():
+        env.run('export {}="{}"'.format(var_name, value))
+
+
 # JS/CSS
 
 def minify_js(jsfile):
