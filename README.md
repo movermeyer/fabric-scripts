@@ -5,8 +5,8 @@ fabric-scripts
 [![Docs Status](https://readthedocs.org/projects/fabric-scripts/badge/?version=latest)](http://fabric-scripts.readthedocs.org/en/latest/index.html)
 [![Coverage Status](https://coveralls.io/repos/paulocheque/fabric-scripts/badge.png?branch=master)](https://coveralls.io/r/paulocheque/fabric-scripts?branch=master)
 [![Code Status](https://landscape.io/github/paulocheque/fabric-scripts/master/landscape.png)](https://landscape.io/github/paulocheque/fabric-scripts/)
-[![PyPi version](https://pypip.in/v/fabric-scripts/badge.png)](https://crate.io/packages/fabric-scripts/)
-[![PyPi downloads](https://pypip.in/d/fabric-scripts/badge.png)](https://crate.io/packages/fabric-scripts/)
+[![PyPi version](https://img.shields.io/pypi/v/fabric-scripts.svg)](https://crate.io/packages/fabric-scripts/)
+[![PyPi downloads](https://img.shields.io/pypi/dm/fabric-scripts.svg)](https://crate.io/packages/fabric-scripts/)
 
 **Latest version: 0.0.26 (2015/10)**
 
